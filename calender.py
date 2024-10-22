@@ -1,31 +1,59 @@
 # application description: 
 # a minimal calendar application.
 
-# The outcome would probably 
-# be that we can save dates in it and send some request to check 
+# The outcome is that we can save dates in it and send some request to check 
 # with the calendar app if we have time or not.
 
 import calendar
+from datetime import datetime
+import json
 
-time_slots = [i for i in range (9, 18)]
+def main():
+  show_calender()
+  show_slots()
+  booking_slot()
 
-def fill_the_dict(time_slots):
-    day_schedule = {}
-    time_slots = [i for i in range (0, 24)]
-    for i in time_slots:
-        day_schedule[i] = "free"
-    return day_schedule
+#a dictionary to store all booked slots
+booked_slots = {}
 
-day_schedule = fill_the_dict(time_slots)
+#displaying a month overview
+def show_calender():
+  calendar_object = calendar.Calendar(firstweekday=0)
 
-def requesting_timeslots(day_schedule, time):
-    slot_request = int(input("what time do you wanna hang out?"))
-    for slot in day_schedule:
-        if slot == "free":
-            day_schedule.update({"slot": "busy"})
-        else: return (print("this time is already taken"))
+  now = datetime.now()
+  theyear = now.year
+  themonth = now.month
+
+  cal = calendar.TextCalendar()
+
+  monthlyview = cal.formatmonth(theyear, themonth, w=0, l=0)
+  print(monthlyview)
+
+#listing out available slots
+def show_slots():
+    print("Available time slots for Today:")
+    for hour in range(9, 18):  # Office hours from 9:00 to 17:59
+        time_str = f"{hour:02}:00"
+        if time_str in booked_slots:
+            print(f"{time_str} - Busy")
+        else:
+            print(f"{time_str} - Free")
 
 
-#def book_slot
+#changing slot status based on user input
+def booking_slot():
+  while True:
+    user_input = input("\nEnter the time slot you want to book(format HH:MM) or 'exit': ")
+    if user_input == "exit":
+       break
+    selected_time = datetime.strptime(user_input, "%H:%M").time()
+    time_str = selected_time.strftime("%H:%M")
+    if time_str in booked_slots:
+      print(f"Slot {time_str} is already booked.")
+      show_slots()
+    else:
+      booked_slots[time_str] = "Busy"
+      print(f"Success: {time_str} has been booked.")
+      show_slots()
 
-#def request_availability
+main()
